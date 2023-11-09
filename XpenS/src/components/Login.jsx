@@ -2,16 +2,18 @@ import {
   View,
   Text,
   ImageBackground,
+  Linking,
   Image,
   TouchableOpacity,
   TextInput,
 } from 'react-native';
 import React, { useState } from 'react';
+import { LoginApi } from '../api/api';
 
 export default function Login({navigation}) {
   const [ email, setEmail ] = useState('');
-  const [ password, setPassword ] = ('');
-  const [ auth, setAuth ] = useState(false)
+  const [ password, setPassword ] = useState('');
+  const [ auth, setAuth ] = useState({})
   const [isFocused, setIsFocused] = useState({
     email:false,
     pass:false
@@ -29,9 +31,16 @@ export default function Login({navigation}) {
   }
 
  const handleLogin = () =>{
-  navigation.navigate('Home');
- }
- 
+  LoginApi(email,password).then((res)=>{
+    setAuth(res)
+    console.log(typeof(res))
+    if(typeof(res)==typeof({})){
+      navigation.navigate('Home');
+    }else{
+      console.warn("invalid Email / Password")
+    }
+  })
+} 
 
   return (
     <View
@@ -56,9 +65,9 @@ export default function Login({navigation}) {
         style={{
           marginTop: 30,
           backgroundColor: 'white',
-          height: 500,
+          height: 'auto',
           width: 300,
-          padding: 15,
+          padding: 45,
           justifyContent: 'center',
           borderRadius: 30,
         }}>
@@ -91,11 +100,12 @@ export default function Login({navigation}) {
             margin: 5,
             marginTop: 15,
           }}
+          value={password}
           onChangeText={(text) => setPassword(text)}
           secureTextEntry={true}
           placeholder="Password"
         />
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=>navigation.navigate('Forgot')}>
           <Text
             style={{
               color: '#1F41BB',
@@ -108,7 +118,7 @@ export default function Login({navigation}) {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => handleLogin()}
+          onPress={()=>handleLogin()}
           style={{
             backgroundColor: '#1F41BB',
             alignSelf: 'center',
