@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const Users = require('./models/UserModels');
 const cors = require('cors');
 require('dotenv').config()
-const { test, RegisterUser, LoginUser, VerifyUser } = require('./ApiEndpoints/ApiCalls');
+const { test, RegisterUser, LoginUser, VerifyUser, ResetUser, ResetOtp, ResetPassword } = require('./ApiEndpoints/ApiCalls');
 
 
 app.get('/',test)
@@ -15,6 +15,9 @@ app.use(express.json())
 app.post('/register-user', RegisterUser)
 app.post('/login-user', LoginUser)
 app.get('/verify-user', VerifyUser)
+app.get('/reset-otp', ResetOtp)
+app.get('/reset-user', ResetUser)
+app.post('/reset-password', ResetPassword)
 
 
 const start = async () => {

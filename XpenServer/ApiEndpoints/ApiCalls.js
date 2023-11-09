@@ -24,8 +24,6 @@ const userRegister = {
     return otp;
   }
 
-  let verificationMailTemp;
-  let successMailTemp;
 
   async function sendMail(email,OTP,template){
     const transporter = nodemailer.createTransport({
@@ -43,7 +41,6 @@ const userRegister = {
     };
     try {
         const result = await transporter.sendMail(mailOptions);
-        console.log('Email Sent')
     } catch (error) {
         console.log(error)
     }
@@ -65,6 +62,7 @@ exports.RegisterUser = async(req,res)=>{
     const newUser = new Users(userRegister);
 
     const OTP = genrateOTP()
+    console.log(OTP)
     const VerifcationToken = new VerifyLogin({
     owner: newUser._id,
     token: OTP
@@ -73,7 +71,7 @@ exports.RegisterUser = async(req,res)=>{
     await VerifcationToken.save()
     await newUser.save().catch((err)=> {return res.json(err)})
 
-    sendMail(newUser.email,OTP,verificationMailTemp)
+    sendMail(newUser.email,OTP)
     .then(()=>res.json(newUser))
     .catch(err=>res.status(400).json('User with same email id already exists: '+err.message))
 
@@ -82,13 +80,12 @@ exports.RegisterUser = async(req,res)=>{
 exports.LoginUser = async(req,res)=>{
     const {email,password,otp} = req.body;
     const user = await Users.findOne({email})
-
     if(!user) return res.send("no user found!!!")
     if(!password) return res.send("please enter a password!!!")
     if(!user.verified) return res.send("Please Verify your Account!!!")
     
     const isLogin = await user.comparePassword(password)
-    if(!isLogin) return res.json('Password does not match!!!')
+    if(!isLogin) return res.send('Password does not match!!!')
 
     const token = jwt.sign({userId:user._id}, process.env.JWT_KEY,{
         expiresIn: '1d'
@@ -116,8 +113,69 @@ exports.VerifyUser = async(req,res)=>{
 
     user.verified = true;
 
-    await VerifyLogin.findByIdAndDelete(token._id)
     await user.save()
+    await VerifyLogin.findByIdAndDelete(token._id)
 
     res.json({success: true, user:{id:user._id, token:token}})
+}
+
+
+exports.ResetOtp = async (req,res) =>{
+    const {email} = req.query
+    const user = await Users.findOne({email})
+    if(!user) return res.send("User Does not Exists !!! ")
+
+    if(!user.verified) return res.send("Unverified User cannot Reset")
+    const OTP = genrateOTP()
+    console.log(OTP)
+    console.log(user._id)
+    user.verified = false;
+    const VerifcationToken = new VerifyLogin({
+    owner: user._id,
+    token: OTP
+    })
+
+    await VerifcationToken.save()
+    await user.save()
+
+    sendMail(user.email,OTP)
+    .then(()=>res.json(user))
+    .catch(err=>res.status(400).json('User with same email id already exists: '+err.message))
+}
+
+
+exports.ResetUser = async(req,res)=>{
+    const {userId,otp} = req.query
+    if(!userId || !otp) return res.send('Input Missing!!!');
+    if(!isValidObjectId(userId)) return res.send('invalid user id!!!');
+
+    const user = await Users.findById(userId)
+    if(!user) return res.send('no user found!!!')
+
+    if(user.verified) return res.send('user already verified')
+
+    const token = await VerifyLogin.findOne({owner:user._id})
+    if(!token) return res.send('no such user found')
+
+    const isMatched = await token.compareToken(otp)
+    if(!isMatched) return res.send('invalid token')
+
+    user.verified = true;
+
+    await user.save()
+    await VerifyLogin.findByIdAndDelete(token._id)
+
+    res.json({success: true, user:{id:user._id, token:token}})
+}
+
+
+exports.ResetPassword = async(req,res)=>{
+    const{userId,password} = req.body;
+    if(!userId) return res.send("invalid uer");
+    const user = await Users.findById(userId);
+
+    if(!user.verified) return res.send("User not Verified !!!")
+    user.password=password;
+    await user.save().catch((err)=>console.log(err))
+    res.json({user})
 }
