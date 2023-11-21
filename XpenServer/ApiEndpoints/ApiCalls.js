@@ -7,12 +7,22 @@ const Users = require('../models/UserModels');
 const jwt = require('jsonwebtoken');
 const VerifyLogin = require('../models/VerificationModel');
 const nodemailer = require('nodemailer');
+const newTranSchema = require('../models/TransactionModel');
 
 
 const userRegister = {
     fullname: "",
     email: "",
     password: "",
+  }
+const newTransactionData = {
+    owner: "",
+    amount: "",
+    title: "",
+    transType:"",
+    category: "",
+    mode: "",
+    desc: "",
   }
 
   genrateOTP = () =>{
@@ -96,7 +106,7 @@ exports.LoginUser = async(req,res)=>{
 }
 
 exports.VerifyUser = async(req,res)=>{
-    const {userId,otp} = req.body
+    const {userId,otp} = req.query
     if(!userId || !otp) return res.send('Input Missing!!!');
     if(!isValidObjectId(userId)) return res.send('invalid user id!!!');
 
@@ -140,7 +150,7 @@ exports.ResetOtp = async (req,res) =>{
 
     sendMail(user.email,OTP)
     .then(()=>res.json(user))
-    .catch(err=>res.status(400).json('User with same email id already exists: '+err.message))
+    .catch(err=>res.status(400).json('User with same email id already exists: '))
 }
 
 
@@ -158,7 +168,7 @@ exports.ResetUser = async(req,res)=>{
     if(!token) return res.send('no such user found')
 
     const isMatched = await token.compareToken(otp)
-    if(!isMatched) return res.send('invalid token')
+    if(!isMatched) return res.json('invalid token')
 
     user.verified = true;
 
@@ -178,4 +188,33 @@ exports.ResetPassword = async(req,res)=>{
     user.password=password;
     await user.save().catch((err)=>console.log(err))
     res.json({user})
+}
+
+
+
+exports.NewTransaction = async(req,res)=>{
+    const{userId,amount,title,transType,category,mode,desc} = req.body;
+    if(!userId) return res.json('invalid user!!!');
+    if(!amount || !title || !category) return res.json("incomplete fields!!!");
+    newTransactionData.owner=userId;
+    newTransactionData.amount=amount;
+    newTransactionData.title=title;
+    newTransactionData.transType=transType;
+    newTransactionData.category=category;
+    newTransactionData.mode=mode;
+    newTransactionData.desc=desc;
+
+    const newTrans = new newTranSchema(newTransactionData);
+    await newTrans.save().catch((err)=> {return res.json(err)})
+    return res.json({success:true,newTrans})
+}
+
+exports.ViewTransaction = async(req,res)=>{
+    const userId = req.query.id;
+
+    if(!userId) return res.send("No User Found !!!");
+    
+    const transactions = await newTranSchema.find({owner:userId})
+    if(!transactions.length) return res.send("no Transaction History")
+    return res.json(transactions)
 }
