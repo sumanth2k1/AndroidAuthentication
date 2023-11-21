@@ -4,10 +4,14 @@ import {
   ImageBackground,
   Image,
   TouchableOpacity,
-  TextInput,
+  // TextInput,
 } from 'react-native';
 import React, { useState } from 'react';
 import { RegisterApi, VerificationApi } from '../api/api';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { TextInput } from 'react-native-paper';
+
+
 
 export default function Signup({navigation}) {
   const [ fname, setFname ] = useState('');
@@ -34,7 +38,7 @@ export default function Signup({navigation}) {
   // }
 
  const handleOTP = () =>{
-   if(!fname) return console.warn("Enter your Full Name")
+   if(!fname) return ("Enter your Full Name")
    if(!email) return console.warn("Enter Email")
    if(!password || !cpass) return console.warn('Empty password')
    if(password !== cpass) return console.warn("password does not Match")
@@ -45,17 +49,21 @@ export default function Signup({navigation}) {
   })
 }
 
-console.log(auth)
+// console.log(auth)
 
  const handleRegister = () =>{
   if(!otp) return console.warn('Enter OTP')
  if(!auth) return console.warn('Verify your Account !!!')
- VerificationApi(auth._id,otp).then(()=>
+ VerificationApi(auth._id,otp).then((res)=>{
+  // if(!res) return console.warn('invalid OTP')
   navigation.navigate('Login')
-)
+})
 }
 
   return (
+    <KeyboardAwareScrollView  keyboardShouldPersistTaps={'always'}
+    contentContainerStyle ={{flexGrow:1}}
+        showsVerticalScrollIndicator={false}>
     <View
       style={{
         flex: 1,
@@ -78,9 +86,9 @@ console.log(auth)
         style={{
           marginTop: 30,
           backgroundColor: 'white',
-          height: 500,
-          width: 300,
-          padding: 15,
+          height: "auto",
+          width: "auto",
+          padding:30,
           justifyContent: 'center',
           borderRadius: 30,
         }}>
@@ -88,7 +96,7 @@ console.log(auth)
           style={{
             backgroundColor: 'white',
             borderBottomColor: '#1F41BB',
-            borderBottomWidth: 1,
+            // borderBottomWidth: 1,
             alignSelf: 'center',
             width: 250,
             borderRadius: 5,
@@ -102,7 +110,7 @@ console.log(auth)
           style={{
             backgroundColor: 'white',
             borderBottomColor: '#1F41BB',
-            borderBottomWidth: 1,
+            // borderBottomWidth: 1,
             alignSelf: 'center',
             width: 250,
             borderRadius: 5,
@@ -116,13 +124,14 @@ console.log(auth)
           style={{
             backgroundColor: 'white',
             borderBottomColor: '#1F41BB',
-            borderBottomWidth: 1,
+            // borderBottomWidth: 1,
             alignSelf: 'center',
             width: 250,
             borderRadius: 5,
             margin: 5,
             marginTop: 15,
           }}onChangeText={(text) => setPassword(text)}
+          secureTextEntry={true}
           value={password}
           placeholder="Password"
         />
@@ -130,7 +139,7 @@ console.log(auth)
           style={{
             backgroundColor: 'white',
             borderBottomColor: '#1F41BB',
-            borderBottomWidth: 1,
+            // borderBottomWidth: 1,
             alignSelf: 'center',
             width: 250,
             borderRadius: 5,
@@ -138,19 +147,21 @@ console.log(auth)
             marginTop: 15,
           }}
           onChangeText={(text) => setCpass(text)}
+          secureTextEntry={true}
           value={cpass}
           placeholder="Confirm Password"
         />
-        <View style={{flex:1, flexDirection:'row',justifyContent:'center'}}>
+        <View style={{flexDirection:'row',justifyContent:'center'}}>
         <TextInput
           style={{
             backgroundColor: 'white',
             borderBottomColor: '#1F41BB',
-            borderBottomWidth: 1,
+            // borderBottomWidth: 1,
             alignSelf: 'center',
-            width: 100,
+            width: 110,
             borderRadius: 5,
             marginRight: 15,
+            marginTop:10
           }}
           onChangeText={(text) => setOtp(text)}
           value={otp} 
@@ -208,5 +219,6 @@ console.log(auth)
         </Text>
       </View>
     </View>
+    </KeyboardAwareScrollView>
   );
 }

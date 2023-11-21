@@ -5,10 +5,12 @@ import {
     Linking,
     Image,
     TouchableOpacity,
-    TextInput,
+    ToastAndroid,
   } from 'react-native';
   import React, { useState } from 'react';
   import { LoginApi, changePass, resetOtp, verifyOtp } from '../api/api';
+  import { TextInput } from 'react-native-paper';
+
   
   export default function ForgotPassword({navigation}) {
     const [ email, setEmail ] = useState('');
@@ -24,6 +26,10 @@ import {
       cpass:false,
       cotp:false,
     })
+
+    const showToast = (message) => {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+    };
   
     const handleInputFocus = (textinput) => {
       setIsFocused({
@@ -37,20 +43,20 @@ import {
     }
 
     const getOtp=()=>{
-      if(!email) return console.warn('Enter your Email address')
-      resetOtp(email).then(res=> setResetId(res)).catch(err=>console.warn(err))
+      if(!email) return showToast('Enter your Email address')
+      resetOtp(email).then(res=> setResetId(res)).catch(err=>showToast(err))
   }
   
   const verifyResetOtp = () => {
-    if(!resetId) return console.warn("Enter a valid Email and get OTP")
+    if(!resetId) return showToast("Enter a valid Email and get OTP")
     verifyOtp(resetId,otp).then(res => {if(res) setVerification(!verification)})
   .catch(err=>console.warn(err))
   }
   
    const handlePassChange = () =>{
-    if(!password || !cpass) return console.warn("Enter New Password and Confirm Password")
-    if(password !== cpass) return console.warn("Password Does not Match");
-    changePass(resetId,password).then(navigation.navigate('Home')).catch(err=>console.log(err))
+    if(!password || !cpass) return showToast("Enter New Password and Confirm Password")
+    if(password !== cpass) return showToast("Password Does not Match");
+    changePass(resetId,password).then(navigation.navigate('Login')).catch(err=>console.log(err))
   } 
   
     return (
@@ -84,12 +90,8 @@ import {
           }}>
         <View>
           <TextInput
-          onFocus={()=>handleInputFocus('email')}
-          onBlur={()=>handleInputBlur('email')}
             style={{
               backgroundColor: 'white',
-              borderBottomColor: '#1F41BB',
-              borderBottomWidth: isFocused.email?2:1,
               alignSelf: 'center',
               width: 250,
               borderRadius: 5,
@@ -104,12 +106,8 @@ import {
           
 
         <TextInput
-        onFocus={()=>handleInputFocus('cotp')}
-        onBlur={()=>handleInputBlur('cotp')}
           style={{
             backgroundColor: 'white',
-            borderBottomColor: '#1F41BB',
-            borderBottomWidth: isFocused.cotp?2:1,
             alignSelf: 'center',
             width: 250,
             borderRadius: 5,
@@ -129,12 +127,8 @@ import {
 { verification ? (
     <>
           <TextInput
-          onFocus={()=>handleInputFocus('pass')}
-          onBlur={()=>handleInputBlur('pass')}
             style={{
               backgroundColor: 'white',
-              borderBottomColor: '#1F41BB',
-              borderBottomWidth: isFocused.pass?2:1,
               alignSelf: 'center',
               width: 250,
               borderRadius: 5,
@@ -148,12 +142,8 @@ import {
           />
           
           <TextInput
-          onFocus={()=>handleInputFocus('cpass')}
-          onBlur={()=>handleInputBlur('cpass')}
           style={{
             backgroundColor: 'white',
-            borderBottomColor: '#1F41BB',
-            borderBottomWidth: isFocused.cpass?2:1,
             alignSelf: 'center',
             width: 250,
             borderRadius: 5,

@@ -33,7 +33,7 @@ export const RegisterApi = async(fullname,email,password)=>{
     }
     try{
         const response = await axios.request(options)
-        console.log(response.data)
+        // console.log(response.data)
         return response.data;
     }catch(err){
         return err
@@ -69,7 +69,7 @@ export const resetOtp = async (email) =>{
         'Content-Type': 'application/json',
       },
     }).catch(err=>console.warn(err))
-    return response.data._id
+    return response
 }
 
 
@@ -83,8 +83,8 @@ export const verifyOtp = async(resetId,otp) => {
         'Content-Type': 'application/json',
       },
     }).catch(err=>console.warn(err))
-    console.log(response.data.success)
-    return response.data.success
+    // console.log(response)
+    return response
 }
 
 
@@ -112,10 +112,62 @@ export const changePass = async(resetId,password)=>{
     }
     try{
         const response = await axios.request(options)
-        console.log(response.data)
+        // console.log(response.data)
         return response.data;
     }catch(err){
         return err
     }
 
 }
+
+
+export const newTransactionDetail = async(userId,amount,title,type,category,mode,desc) =>{
+  const options = {
+    method: 'POST',
+    url: 'http://10.0.2.2:3000/new-transaction',
+    headers:{
+    'Content-Type': 'application/json;charset=UTF-8',
+    "Access-Control-Allow-Origin": "*",
+    },
+    data :{userId:userId,amount:amount,title:title,transType:type,category:category,mode:mode,desc:desc}
+    }
+    try{
+        const response = await axios.request(options)
+        // console.log(response.data)
+        return response.data;
+    }catch(err){
+        return err
+    }
+}
+
+
+export const loadTransData = async(id)=>{
+  const response = await axios.get('http://10.0.2.2:3000/view-transaction', {
+    params: {id},
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).catch(err=>console.warn(err))
+  // console.log("api",id,response.data)
+  return response.data
+}
+
+
+// export const addTrans = async(userId,amount,title,type,category,mode,desc)=>{
+//   const options = {
+//     method: 'POST',
+//     url: 'http://10.0.2.2:3000/new-transaction',
+//     headers:{
+//     'Content-Type': 'application/json;charset=UTF-8',
+//     "Access-Control-Allow-Origin": "*",
+//     },
+//     data :{userId:userId,amount:amount,title:title,category:category,mode:mode,desc:desc}
+//     }
+//     try{
+//         const response = await axios.request(options)
+//         console.log(response.data)
+//         return response.data;
+//     }catch(err){
+//         return err
+//     }
+// }

@@ -1,7 +1,21 @@
 import { View, Text, ImageBackground, Image, TouchableOpacity } from 'react-native'
-import React from 'react';
+import React, { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function StartupSplash({navigation}) {
+  useFocusEffect(
+    React.useCallback(() => {
+      const checkLogin = async()=>{
+        const userdata = await AsyncStorage.getItem("User")
+        if (userdata) navigation.navigate('Home')
+      }
+
+      checkLogin();
+    }, [])
+  );
+
+
   return (
     <View
       style={{
