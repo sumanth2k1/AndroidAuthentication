@@ -4,12 +4,13 @@ import {
   ImageBackground,
   Image,
   TouchableOpacity,
+  ToastAndroid,
   // TextInput,
 } from 'react-native';
 import React, { useState } from 'react';
 import { RegisterApi, VerificationApi } from '../api/api';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { TextInput } from 'react-native-paper';
+import { Checkbox, Icon, TextInput } from 'react-native-paper';
 
 
 
@@ -21,6 +22,8 @@ export default function Signup({navigation}) {
   const [ otpcheck, setOtpcheck ] = useState(false)
   const [ otp, setOtp ] = useState('')
   const [ auth, setAuth ] = useState()
+  const [checked, setChecked] = useState(false);
+
   // const [isFocused, setIsFocused] = useState({
   //   email:false,
   //   pass:false
@@ -37,6 +40,11 @@ export default function Signup({navigation}) {
   //   })
   // }
 
+  const showToast = message => {
+    ToastAndroid.show(message, ToastAndroid.SHORT);
+  };
+
+
  const handleOTP = () =>{
    if(!fname) return ("Enter your Full Name")
    if(!email) return console.warn("Enter Email")
@@ -47,7 +55,7 @@ export default function Signup({navigation}) {
     setOtpcheck(true)
     setAuth(res)
   })
-}
+} 
 
 // console.log(auth)
 
@@ -55,6 +63,7 @@ export default function Signup({navigation}) {
   if(!otp) return console.warn('Enter OTP')
  if(!auth) return console.warn('Verify your Account !!!')
  VerificationApi(auth._id,otp).then((res)=>{
+  showToast("Account Created Successfully")
   // if(!res) return console.warn('invalid OTP')
   navigation.navigate('Login')
 })
@@ -84,7 +93,7 @@ export default function Signup({navigation}) {
       </Text>
       <View
         style={{
-          marginTop: 30,
+          marginTop: 10,
           backgroundColor: 'white',
           height: "auto",
           width: "auto",
@@ -100,7 +109,7 @@ export default function Signup({navigation}) {
             alignSelf: 'center',
             width: 250,
             borderRadius: 5,
-            margin: 5,
+            // margin: 5,
           }}
           onChangeText={(text) => setFname(text)}
           value={fname}
@@ -114,7 +123,7 @@ export default function Signup({navigation}) {
             alignSelf: 'center',
             width: 250,
             borderRadius: 5,
-            margin: 5,
+            // margin: 5,
           }}
           onChangeText={(text) => setEmail(text)}
           value={email}
@@ -128,10 +137,10 @@ export default function Signup({navigation}) {
             alignSelf: 'center',
             width: 250,
             borderRadius: 5,
-            margin: 5,
-            marginTop: 15,
+            // margin: 5,
+            // marginTop: 15,
           }}onChangeText={(text) => setPassword(text)}
-          secureTextEntry={true}
+          secureTextEntry={checked}
           value={password}
           placeholder="Password"
         />
@@ -143,11 +152,11 @@ export default function Signup({navigation}) {
             alignSelf: 'center',
             width: 250,
             borderRadius: 5,
-            margin: 5,
-            marginTop: 15,
+            // margin: 5,
+            // marginTop: 15,
           }}
           onChangeText={(text) => setCpass(text)}
-          secureTextEntry={true}
+          secureTextEntry={checked}
           value={cpass}
           placeholder="Confirm Password"
         />
@@ -160,8 +169,8 @@ export default function Signup({navigation}) {
             alignSelf: 'center',
             width: 110,
             borderRadius: 5,
-            marginRight: 15,
-            marginTop:10
+            // marginRight: 15,
+            // marginTop:10
           }}
           onChangeText={(text) => setOtp(text)}
           value={otp} 
@@ -181,7 +190,23 @@ export default function Signup({navigation}) {
           }}>
           <Text style={{alignSelf: 'center', color: 'white', fontSize:10}}>Get OTP</Text>
         </TouchableOpacity>
+
         </View>
+        <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop:20
+            }}>
+            <Checkbox
+              status={checked ? 'unchecked' : 'checked'}
+              onPress={() => {
+                setChecked(!checked);
+              }}
+            />
+            <Text>Show Password</Text>
+          </View>
         <TouchableOpacity
           onPress={() => handleRegister()}
           style={{
@@ -191,7 +216,7 @@ export default function Signup({navigation}) {
             width: 150,
             justifyContent: 'center',
             borderRadius: 5,
-            marginTop: 25,
+            marginTop: 5,
           }}>
           <Text style={{alignSelf: 'center', color: 'white'}}>Verify & Sign Up</Text>
         </TouchableOpacity>
@@ -204,7 +229,7 @@ export default function Signup({navigation}) {
             alignSelf: 'center',
             justifyContent: 'center',
             borderRadius: 5,
-            marginTop: 25,
+            marginTop: 5,
           }}>
           <Text style={{alignSelf: 'center', color: '#1F41BB'}}>Login</Text>
         </TouchableOpacity>
@@ -217,6 +242,12 @@ export default function Signup({navigation}) {
           }}>
           Or continue with
         </Text>
+        <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center",marginTop:15}}>
+          <Icon source="twitter" size={25}/>
+          <Icon source="google" size={25}/>
+          <Icon source="google-plus" size={25}/>
+          <Icon source="facebook" size={25}/>
+        </View>
       </View>
     </View>
     </KeyboardAwareScrollView>

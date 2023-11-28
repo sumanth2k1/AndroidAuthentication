@@ -52,7 +52,7 @@ export const VerificationApi = async(userId,otp)=>{
           headers: {
             'Content-Type': 'application/json',
           },
-        }).then(res=> console.warn('Verification Successfully',res))
+        }).then(res=> console.log('Verification Successfully',res))
         return response
       } catch (error) {
         return (error);
@@ -83,7 +83,7 @@ export const verifyOtp = async(resetId,otp) => {
         'Content-Type': 'application/json',
       },
     }).catch(err=>console.warn(err))
-    // console.log(response)
+    console.log(response.data)
     return response
 }
 

@@ -2,13 +2,19 @@ import { View, Text, ImageBackground, Image, TouchableOpacity } from 'react-nati
 import React, { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { currUserData } from '../components/redux/action';
 
 export default function StartupSplash({navigation}) {
+  const dispatch = useDispatch();
   useFocusEffect(
     React.useCallback(() => {
       const checkLogin = async()=>{
-        const userdata = await AsyncStorage.getItem("User")
-        if (userdata) navigation.navigate('Home')
+        const userData = await AsyncStorage.getItem("User")
+        if (userData) {
+          dispatch(currUserData(userData));
+          navigation.navigate('Home')
+        }
       }
 
       checkLogin();

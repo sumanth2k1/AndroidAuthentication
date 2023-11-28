@@ -12,8 +12,10 @@ import {Avatar, Icon, TextInput} from 'react-native-paper';
 import DropDown from 'react-native-paper-dropdown';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
+import { useSelector } from 'react-redux';
 
-export default function NewTransaction(close) {
+export default function NewTransaction(Close) {
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('');
   const [type, setType] = useState(null);
@@ -26,16 +28,17 @@ export default function NewTransaction(close) {
   const [currUser, setUser] = useState({});
 
   const data = [
-    {label: 'Medical', value: '1'},
-    {label: 'Food', value: '2'},
-    {label: 'Party', value: '3'},
-    {label: 'Gifts', value: '4'},
-    {label: 'Salary', value: '5'},
-    {label: 'Bills', value: '6'},
-    {label: 'Fuel', value: '7'},
-    {label: 'travel', value: '8'},
-    {label: 'Outings', value: '9'},
-    {label: 'Other', value: '10'},
+    {label: 'Goal', value: '1'},
+    {label: 'Medical', value: '2'},
+    {label: 'Food', value: '3'},
+    {label: 'Party', value: '4'},
+    {label: 'Gifts', value: '5'},
+    {label: 'Salary', value: '6'},
+    {label: 'Bills', value: '7'},
+    {label: 'Fuel', value: '8'},
+    {label: 'travel', value: '9'},
+    {label: 'Outings', value: '10'},
+    {label: 'Other', value: '11'},
   ];
   const data1 = [
     {label: 'Cash', value: '1'},
@@ -49,45 +52,65 @@ export default function NewTransaction(close) {
     {label: 'Debit', value: '2'},
   ];
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const getData = async () => {
-        const userdata = await AsyncStorage.getItem('User').then(val=>JSON.parse(val))
-        setUser(userdata);
-      };
-       
-      getData();
-    }, []),
-    );
+  const reduxData = useSelector((state)=>state.reducer)
+  const loggedData = JSON.parse(reduxData)
 
-  const showToast = message => {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
-  };
+
+  
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const getData = async () => {
+  //       const userdata = await AsyncStorage.getItem('User').then(val=>JSON.parse(val))
+  //       setUser(userdata);
+  //     };
+       
+  //     getData();
+  //   }, []),
+  //   );
+
+  // const showToast = message => {
+  //   ToastAndroid.show(message, ToastAndroid.SHORT);
+  // };
+
+  const showToast = (mtype,message,desc) => {
+    Toast.show({
+      type: mtype,
+      text1: message,
+      text2: desc
+    });
+  }
+
+
 
   const handleNew = async () => {
     // newTransactionDetail(user.userId,amount,title,category,mode,desc).then(res.send("Transaction added successfully"))
   };
 
   const addNew = async () => {
-    if (!amount) return showToast('Enter all fields !!!');
-    if (!title) return showToast('Enter all fields !!!');
-    if (!desc) return showToast('Enter all fields !!!');
-    let response = await newTransactionDetail(
-      currUser.id,
+    if (!amount) return showToast('error','Enter all fields !!!');
+    if (!title) return showToast('error','Enter all fields !!!');
+    if (!type) return showToast('error','Enter all fields !!!');
+    if (!category) return showToast('error','Enter all fields !!!');
+    if (!mode) return showToast('error','Enter all fields !!!');
+    if (!desc) return showToast('error','Enter all fields !!!');
+    await newTransactionDetail(
+      loggedData.id,
       amount,
       title,
       type,
       category,
       mode,
       desc,
-    );
-    showToast('Transaction added successfully');
-    setAmount('');
-    setTitle('');
-    setVal1(null);
-    setVal2(null);
-    setVal3(null);
-    setDesc('');
+    ).then(
+    showToast('success','Transaction added successfully'),
+    setAmount(''),
+    setTitle(''),
+    setVal1(null),
+    setVal2(null),
+    setVal3(null),
+    setDesc(''),
+    Close.close()
+    )
   };
 
   return (
@@ -102,13 +125,13 @@ export default function NewTransaction(close) {
       }}>
       <View style={{flexDirection:"row",justifyContent:"space-between"}}>
       <TouchableOpacity
-        onPress={() => close.close()}
+        onPress={() => Close.close()}
         style={{
           margin: 20,
           borderRadius: 100,
         }}>
         {/* <Icon color="#a8326b" source="arrow-left" size={30} /> */}
-        <Text>{"<  Back"}</Text>
+        <Text>{"< Exit"}</Text>
       </TouchableOpacity>
       </View>
       <View>

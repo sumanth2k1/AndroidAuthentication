@@ -12,6 +12,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import DashboardNavStack from './DashboardNav';
 import Settings from '../screens/Settings';
 import Reports from '../screens/Reports';
+import { useDispatch, useSelector } from 'react-redux';
+import { currUserData } from '../components/redux/action';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -19,21 +21,29 @@ const Stack = createNativeStackNavigator();
 
 export default function NavStack() {
   const [isLogin, setLogin] = useState(false);
+  const dispatch = useDispatch();
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const getData = async () => {
-        const userdata = await AsyncStorage.getItem('User').then(val=>JSON.parse(val));
-        console.log(userdata)
-        if(userdata) setLogin(true)
-      };
+  
+  const getData = async () => {
+    const userdata = await AsyncStorage.getItem('User').then(val=>JSON.parse(val));
+    dispatch(currUserData(JSON.stringify(userdata)))
+    if(userdata) setLogin(true)
+  };
 
-      getData();
-    }, []),
-  );
-  console.log(isLogin)
+useEffect(() => {      
+  getData();
+}, [])
 
-  return isLogin ? (
+  const reduxData = useSelector(state => state?.reducer);
+  if (reduxData.length && typeof(reduxData)==typeof({})) {
+    console.log("signout",reduxData.length)
+  }else {
+    console.log("Logged",reduxData.length)
+  }
+  // const loggedData = JSON.parse(reduxData);
+  // console.log(loggedData)
+
+  return reduxData.length && typeof(reduxData)==typeof({}) ? (
     <Tab.Navigator>
       <Tab.Screen
         name="Dashboard"

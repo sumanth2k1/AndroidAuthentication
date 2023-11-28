@@ -6,6 +6,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import AuthNavStack from './src/navigation/AuthNavStack';
 import { enGB, registerTranslation } from 'react-native-paper-dates'
 import NavStack from './src/navigation/NavigationStack';
+import Toast from 'react-native-toast-message';
 registerTranslation('en-GB', enGB)
 
 const Stack = createNativeStackNavigator();
@@ -14,6 +15,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <NavStack/>
+      <Toast />
     </NavigationContainer>
   )
 }

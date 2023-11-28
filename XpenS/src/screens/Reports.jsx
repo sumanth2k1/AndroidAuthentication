@@ -5,10 +5,11 @@ import {BarChart, LineChart, PieChart} from 'react-native-gifted-charts';
 import {registerTranslation} from 'react-native-paper-dates';
 import {DatePickerModal} from 'react-native-paper-dates';
 import Chart from 'react-google-charts';
-import { Icon } from 'react-native-paper';
+import {Icon} from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 
 export const options = {
-  title: "My Daily Activities",
+  title: 'My Daily Activities',
   pieHole: 0.4,
   is3D: false,
 };
@@ -32,6 +33,14 @@ export default function Reports() {
     },
     [setOpen, setRange],
   );
+
+  const showToast = (mtype, message, desc) => {
+    Toast.show({
+      type: mtype,
+      text1: message,
+      text2: desc,
+    });
+  };
 
   const stackData = [
     {
@@ -132,10 +141,10 @@ export default function Reports() {
   //   ['Income', 2],
   // ];
   const pieData = [
-    {value: 70, color: '#177AD5'},
-    {value: 30, color: 'lightgray'},
+    {value: 54, color: '#177AD5'},
+    {value: 40, color: '#79D2DE'},
+    {value: 20, color: '#ED6665'},
   ];
-
 
   return (
     <View
@@ -149,56 +158,16 @@ export default function Reports() {
         style={{height: '100%', width: '100%', position: 'absolute'}}
         blurRadius={7}
       />
-      <View style={{flexDirection:"row", justifyContent: 'center', flex: 1, alignItems: 'center' }}>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        data={data}
-        search
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder="Select Range"
-        searchPlaceholder="Search..."
-        value={value}
-        onChange={item => {
-          setValue(item.value);
-        }}
-      />
-        <TouchableOpacity onPress={() => setOpen(true)} uppercase={false} mode="outlined">
-          <Text style={{fontSize:25,marginTop:10}}><Icon source="calendar-multiple" size={25}/></Text>
-        </TouchableOpacity>
-        <DatePickerModal
-          locale="en"
-          mode="range"
-          visible={open}
-          onDismiss={onDismiss}
-          startDate={range.startDate}
-          endDate={range.endDate}
-          onConfirm={onConfirm}
-        />
-      </View>
-      <TouchableOpacity
-        style={{
-          height: 30,
-          width: 150,
-          justifyContent: 'center',
-          alignItems: 'center',
-          alignSelf: 'center',
-          marginTop: 40,
-          borderRadius: 30,
-          backgroundColor: 'green',
-        }}>
-        <Text style={{color: 'white'}}>Generate Report</Text>
-      </TouchableOpacity>
+
       <View
         style={[
           {
-            backgroundColor: '#ffe6fe',
+            backgroundColor: '#fff',
+            height: 350,
             margin: 15,
             borderRadius: 20,
+            justifyContent: 'center',
+            alignItems: 'center',
             padding: 10,
           },
           styles.shadowProp,
@@ -208,31 +177,85 @@ export default function Reports() {
             alignSelf: 'center',
             justifyContent: 'center',
           }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              flex: 1,
+              alignItems: 'center',
+            }}>
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              data={data}
+              search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Range"
+              searchPlaceholder="Search..."
+              value={value}
+              onChange={item => {
+                setValue(item.value);
+              }}
+            />
+            <TouchableOpacity
+              onPress={() => setOpen(true)}
+              uppercase={false}
+              mode="outlined">
+              <Text style={{fontSize: 25, marginTop: 10}}>
+                <Icon source="calendar-multiple" size={25} />
+              </Text>
+            </TouchableOpacity>
+            <DatePickerModal
+              locale="en"
+              mode="range"
+              visible={open}
+              onDismiss={onDismiss}
+              startDate={range.startDate}
+              endDate={range.endDate}
+              onConfirm={onConfirm}
+            />
+          </View>
+          <View style={[{alignSelf:"center",borderRadius:110}]}>
           <PieChart
-            donut
-            innerRadius={80}
             data={pieData}
-            centerLabelComponent={() => {
-              return <Text style={{fontSize: 30}}>70%</Text>;
-            }}
+            showText
+            textColor="black"
+            radius={100}
+            textSize={20}
+            focusOnPress
+            showValuesAsLabels
+            showTextBackground
+            textBackgroundRadius={26}
           />
-          {/* <Chart
-            chartType="PieChart"
-            width="100%"
-            height="400px"
-            data={pieData}
-            options={options}
-          /> */}
+          </View>
+          <TouchableOpacity
+          onPress={()=>showToast('success', "Downloaded", "Report.pdf downloaded")}
+            style={{
+              height: 30,
+              width: 150,
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignSelf: 'center',
+              // marginTop: 40,
+              borderRadius: 30,
+              backgroundColor: 'green',
+            }}>
+            <Text style={{color: 'white'}}>Generate Report</Text>
+          </TouchableOpacity>
         </View>
       </View>
-      <View style={{backgroundColor:"#ffe6fe",borderRadius:20,padding:20,marginTop: 5, marginLeft: 10}}>
-        <BarChart
-          width={340}
-          rotateLabel
-          noOfSections={4}
-          stackData={stackData}
-        />
-      </View>
+      {/* <View style={{backgroundColor:"#ffe6fe",borderRadius:20,padding:20,marginTop: 5, marginLeft: 10}}> */}
+      <BarChart
+        width={340}
+        rotateLabel
+        noOfSections={4}
+        stackData={stackData}
+      />
+      {/* </View> */}
     </View>
   );
 }
